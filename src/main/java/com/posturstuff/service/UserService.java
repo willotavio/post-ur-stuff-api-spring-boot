@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -42,20 +43,20 @@ public class UserService {
                 user.email(),
                 passwordEncoder.encode(user.password()),
                 LocalDate.now(),
-                user.birthDate(),
+                user.birthDate() != null ? user.birthDate() : null,
                 AccountVisibility.PUBLIC,
-                "",
-                ""
+                null,
+                null
         ));
         return userMapper.userToUserViewDto(newUser);
     }
 
-    public String verify(UserLoginDto user) {
+    public Optional<String> verify(UserLoginDto user) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.username(), user.password()));
         if(authentication.isAuthenticated()) {
-            return jwtService.generateToken(user.username());
+            return Optional.of(jwtService.generateToken(user.username()));
         }
-        return "Fail";
+        return Optional.empty();
     }
 
     public List<UserViewDto> getAll() {
@@ -65,6 +66,14 @@ public class UserService {
             usersDto.add(userMapper.userToUserViewDto(user));
         }
         return usersDto;
+    }
+
+    public Optional<UserViewDto> getById(String id) {
+        Optional<Users> user = userRepository.findById(id);
+        if(user.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(userMapper.userToUserViewDto(user.get()));
     }
 
 }
