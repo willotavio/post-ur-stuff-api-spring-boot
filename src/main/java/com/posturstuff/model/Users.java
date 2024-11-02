@@ -16,6 +16,9 @@ import java.time.LocalDate;
 @ToString
 public class Users {
 
+    @Id
+    private String id;
+
     @Indexed(unique = true)
     private String username;
     private String displayName;
@@ -30,5 +33,17 @@ public class Users {
 
     private String profilePicture;
     private String profileCover;
+
+    public Users(String username, String displayName, String email, String password, LocalDate joinedAt, LocalDate birthDate, AccountVisibility accountVisibility, String profilePicture, String profileCover) {
+        this.username = username;
+        this.displayName = displayName;
+        this.email = email;
+        this.password = password;
+        this.joinedAt = joinedAt;
+        this.birthDate = birthDate;
+        this.accountVisibility = accountVisibility;
+        this.profilePicture = profilePicture;
+        this.profileCover = profileCover;
+    }
 
 }

@@ -76,4 +76,13 @@ public class UserService {
         return Optional.of(userMapper.userToUserViewDto(user.get()));
     }
 
+    public Optional<UserViewDto> deleteById(String id) {
+        Optional<Users> user = userRepository.findById(id);
+        if(user.isEmpty()) {
+            return Optional.empty();
+        }
+        userRepository.deleteById(id);
+        return Optional.of(userMapper.userToUserViewDto(user.get()));
+    }
+
 }

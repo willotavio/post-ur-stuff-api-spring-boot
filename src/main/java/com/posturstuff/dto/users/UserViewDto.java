@@ -3,6 +3,7 @@ package com.posturstuff.dto.users;
 import java.time.LocalDate;
 
 public record UserViewDto(
+        String id,
         String username,
         String displayName,
         String email,

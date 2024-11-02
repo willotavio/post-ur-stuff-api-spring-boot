@@ -65,4 +65,20 @@ public class UserController {
         return ResponseEntity.status(responseStatus).body(responseBody);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteById(@PathVariable("id") String id) {
+        HttpStatus responseStatus = null;
+        Map<String, Object> responseBody = new HashMap<>();
+        Optional<UserViewDto> user = userService.deleteById(id);
+        if(user.isEmpty()) {
+            responseStatus = HttpStatus.NOT_FOUND;
+            responseBody.put("message", "User not found");
+        }
+        else {
+            responseStatus = HttpStatus.OK;
+            responseBody.put("user", user);
+        }
+        return ResponseEntity.status(responseStatus).body(responseBody);
+    }
+
 }
