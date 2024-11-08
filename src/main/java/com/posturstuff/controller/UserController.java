@@ -2,6 +2,7 @@ package com.posturstuff.controller;
 
 import com.posturstuff.dto.users.UserLoginDto;
 import com.posturstuff.dto.users.UserRegisterDto;
+import com.posturstuff.dto.users.UserUpdateDto;
 import com.posturstuff.dto.users.UserViewDto;
 import com.posturstuff.service.UserService;
 import jakarta.validation.Valid;
@@ -70,6 +71,22 @@ public class UserController {
         HttpStatus responseStatus = null;
         Map<String, Object> responseBody = new HashMap<>();
         Optional<UserViewDto> user = userService.deleteById(id);
+        if(user.isEmpty()) {
+            responseStatus = HttpStatus.NOT_FOUND;
+            responseBody.put("message", "User not found");
+        }
+        else {
+            responseStatus = HttpStatus.OK;
+            responseBody.put("user", user);
+        }
+        return ResponseEntity.status(responseStatus).body(responseBody);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Object> updateById(@PathVariable("id") String id, @RequestBody @Valid UserUpdateDto userUpdateDto) {
+        HttpStatus responseStatus = null;
+        Map<String, Object> responseBody = new HashMap<>();
+        Optional<UserViewDto> user = userService.updateById(id, userUpdateDto);
         if(user.isEmpty()) {
             responseStatus = HttpStatus.NOT_FOUND;
             responseBody.put("message", "User not found");

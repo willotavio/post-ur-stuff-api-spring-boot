@@ -2,6 +2,7 @@ package com.posturstuff.service;
 
 import com.posturstuff.dto.users.UserLoginDto;
 import com.posturstuff.dto.users.UserRegisterDto;
+import com.posturstuff.dto.users.UserUpdateDto;
 import com.posturstuff.dto.users.UserViewDto;
 import com.posturstuff.enums.AccountVisibility;
 import com.posturstuff.mapper.UserMapper;
@@ -73,6 +74,41 @@ public class UserService {
         if(user.isEmpty()) {
             return Optional.empty();
         }
+        return Optional.of(userMapper.userToUserViewDto(user.get()));
+    }
+
+    public Optional<UserViewDto> updateById(String id, UserUpdateDto userUpdateDto) {
+        Optional<Users> user = userRepository.findById(id);
+        if(user.isEmpty()) {
+            return Optional.empty();
+        }
+        if(userUpdateDto.username() != null) {
+            user.get().setUsername(userUpdateDto.username());
+        }
+        if(userUpdateDto.displayName() != null) {
+            user.get().setDisplayName(userUpdateDto.displayName());
+        }
+        if(userUpdateDto.email() != null) {
+            user.get().setEmail(userUpdateDto.email());
+        }
+        if(userUpdateDto.password() != null && userUpdateDto.passwordConfirmation() != null
+            && userUpdateDto.password().equals(userUpdateDto.passwordConfirmation())) {
+            user.get().setPassword(passwordEncoder.encode(userUpdateDto.password()));
+        }
+        if(userUpdateDto.birthDate() != null) {
+            user.get().setBirthDate(userUpdateDto.birthDate());
+        }
+        if(userUpdateDto.accountVisibility() > 0
+                && AccountVisibility.valueOf(userUpdateDto.accountVisibility()).getCode() > 0) {
+            user.get().setAccountVisibility(AccountVisibility.valueOf(userUpdateDto.accountVisibility()));
+        }
+        if(userUpdateDto.profilePicture() != null) {
+            user.get().setProfilePicture(userUpdateDto.profilePicture());
+        }
+        if(userUpdateDto.profileCover() != null) {
+            user.get().setProfileCover(userUpdateDto.profileCover());
+        }
+        userRepository.save(user.get());
         return Optional.of(userMapper.userToUserViewDto(user.get()));
     }
 
