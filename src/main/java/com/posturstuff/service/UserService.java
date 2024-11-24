@@ -77,7 +77,7 @@ public class UserService {
         return Optional.of(userMapper.userToUserViewDto(user.get()));
     }
 
-    public Optional<UserViewDto> updateById(String id, UserUpdateDto userUpdateDto) {
+    public Optional<UserViewDto> update(String id, UserUpdateDto userUpdateDto) {
         Optional<Users> user = userRepository.findById(id);
         if(user.isEmpty()) {
             return Optional.empty();

@@ -4,11 +4,13 @@ import com.posturstuff.dto.users.UserLoginDto;
 import com.posturstuff.dto.users.UserRegisterDto;
 import com.posturstuff.dto.users.UserUpdateDto;
 import com.posturstuff.dto.users.UserViewDto;
+import com.posturstuff.model.UserPrincipal;
 import com.posturstuff.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -66,11 +68,11 @@ public class UserController {
         return ResponseEntity.status(responseStatus).body(responseBody);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteById(@PathVariable("id") String id) {
+    @PatchMapping
+    public ResponseEntity<Object> update(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody @Valid UserUpdateDto userUpdateDto) {
         HttpStatus responseStatus = null;
         Map<String, Object> responseBody = new HashMap<>();
-        Optional<UserViewDto> user = userService.deleteById(id);
+        Optional<UserViewDto> user = userService.update(userPrincipal.getId(), userUpdateDto);
         if(user.isEmpty()) {
             responseStatus = HttpStatus.NOT_FOUND;
             responseBody.put("message", "User not found");
@@ -82,11 +84,11 @@ public class UserController {
         return ResponseEntity.status(responseStatus).body(responseBody);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<Object> updateById(@PathVariable("id") String id, @RequestBody @Valid UserUpdateDto userUpdateDto) {
+    @DeleteMapping
+    public ResponseEntity<Object> delete(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         HttpStatus responseStatus = null;
         Map<String, Object> responseBody = new HashMap<>();
-        Optional<UserViewDto> user = userService.updateById(id, userUpdateDto);
+        Optional<UserViewDto> user = userService.deleteById(userPrincipal.getId());
         if(user.isEmpty()) {
             responseStatus = HttpStatus.NOT_FOUND;
             responseBody.put("message", "User not found");
