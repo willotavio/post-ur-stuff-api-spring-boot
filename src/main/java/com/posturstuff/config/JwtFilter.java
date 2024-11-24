@@ -2,6 +2,8 @@ package com.posturstuff.config;
 
 import com.posturstuff.service.JwtService;
 import com.posturstuff.service.UserDetailsServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -41,20 +44,37 @@ public class JwtFilter extends OncePerRequestFilter {
        String token = null;
        String username = null;
 
-       if(authHeader != null && authHeader.startsWith("Bearer ")) {
-           token = authHeader.substring(7);
-           username = jwtService.extractUsername(token);
+       try {
+           if(authHeader != null && authHeader.startsWith("Bearer ")) {
+               token = authHeader.substring(7);
+               username = jwtService.extractUsername(token);
+           }
+
+           if(authHeader != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+               UserDetails userDetails = context.getBean(UserDetailsServiceImpl.class).loadUserByUsername(username);
+               if(jwtService.validateToken(token, userDetails)) {
+                   UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                   authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                   SecurityContextHolder.getContext().setAuthentication(authToken);
+               }
+           }
+           filterChain.doFilter(request, response);
+           // handling these exceptions here since it won't reach Controller Advice
+       } catch(ExpiredJwtException ex) {
+            writeErrorResponse(response, "TOKEN_EXPIRED", ex.getMessage());
+       } catch(SignatureException ex) {
+           writeErrorResponse(response, "BAD_SIGNATURE", ex.getMessage());
+       } catch(UsernameNotFoundException ex) {
+           writeErrorResponse(response, "NOT_FOUND", ex.getMessage());
        }
 
-       if(authHeader != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-           UserDetails userDetails = context.getBean(UserDetailsServiceImpl.class).loadUserByUsername(username);
-           if(jwtService.validateToken(token, userDetails)) {
-               UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-               authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-               SecurityContextHolder.getContext().setAuthentication(authToken);
-           }
-       }
-       filterChain.doFilter(request, response);
+    }
+
+    private void writeErrorResponse(HttpServletResponse response, String error, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        String jsonResponse = String.format("{\"error\": \"%s\", \"message\":\"%s\"}", error, message);
+        response.getWriter().write(jsonResponse);
     }
 
 }
