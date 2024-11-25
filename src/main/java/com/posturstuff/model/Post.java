@@ -28,12 +28,11 @@ public class Post {
     private LocalDate editedAt;
     private PostVisibility visibility;
 
-    public Post(String content, List<String> images, Users user, LocalDate createdAt, LocalDate editedAt, PostVisibility visibility) {
+    public Post(String content, List<String> images, Users user, LocalDate createdAt, PostVisibility visibility) {
         this.content = content;
         this.images = images;
         this.user = user;
         this.createdAt = createdAt;
-        this.editedAt = editedAt;
         this.visibility = visibility;
     }
 
