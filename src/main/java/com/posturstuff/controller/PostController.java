@@ -3,6 +3,7 @@ package com.posturstuff.controller;
 import com.posturstuff.dto.posts.PostAddDto;
 import com.posturstuff.dto.posts.PostUpdateDto;
 import com.posturstuff.dto.posts.PostViewDto;
+import com.posturstuff.enums.PostVisibility;
 import com.posturstuff.model.UserPrincipal;
 import com.posturstuff.service.PostService;
 import jakarta.validation.Valid;
@@ -22,16 +23,19 @@ public class PostController {
     public PostService postService;
 
     @GetMapping
-    public ResponseEntity<List<PostViewDto>> getAll() {
-        List<PostViewDto> posts = postService.getAll();
-        return ResponseEntity.status(HttpStatus.OK).body(posts);
+    public ResponseEntity<Map<String, List<PostViewDto>>> getAllPublic() {
+        HttpStatus responseStatus = HttpStatus.OK;
+        Map<String, List<PostViewDto>> responseBody = new HashMap<>();
+        List<PostViewDto> posts = postService.getByVisibility(PostVisibility.PUBLIC.toString());
+        responseBody.put("posts", posts);
+        return ResponseEntity.status(responseStatus).body(responseBody);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getById(@PathVariable("id") String id) {
+    public ResponseEntity<Object> getById(@PathVariable("id") String id, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         HttpStatus responseStatus = null;
         Map<String, Object> responseBody = new HashMap<>();
-        Optional<PostViewDto> post = postService.getById(id);
+        Optional<PostViewDto> post = postService.getById(id, userPrincipal.getId());
         if(post.isEmpty()) {
             responseStatus = HttpStatus.NOT_FOUND;
             responseBody.put("message", "Post not found");
@@ -40,6 +44,33 @@ public class PostController {
             responseStatus = HttpStatus.OK;
             responseBody.put("post", post.get());
         }
+        return ResponseEntity.status(responseStatus).body(responseBody);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Map<String, List<PostViewDto>>> getOwnPosts(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        HttpStatus responseStatus = HttpStatus.OK;
+        Map<String, List<PostViewDto>> responseBody = new HashMap<>();
+        List<PostViewDto> posts = postService.getByUserId(userPrincipal.getId());
+        responseBody.put("posts", posts);
+        return ResponseEntity.status(responseStatus).body(responseBody);
+    }
+
+    @GetMapping("/me/{visibility}")
+    public ResponseEntity<Map<String, List<PostViewDto>>> getOwnPostsWithVisibility(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable("visibility") String visibility) {
+        HttpStatus responseStatus = HttpStatus.OK;
+        Map<String, List<PostViewDto>> responseBody = new HashMap<>();
+        List<PostViewDto> posts = postService.getByUserIdAndVisibility(userPrincipal.getId(), visibility.toUpperCase());
+        responseBody.put("posts", posts);
+        return ResponseEntity.status(responseStatus).body(responseBody);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Map<String, List<PostViewDto>>> getPublicByUserId(@PathVariable("userId") String userId) {
+        HttpStatus responseStatus = HttpStatus.OK;
+        Map<String, List<PostViewDto>> responseBody = new HashMap<>();
+        List<PostViewDto> posts = postService.getByUserIdAndVisibility(userId, PostVisibility.PUBLIC.toString());
+        responseBody.put("posts", posts);
         return ResponseEntity.status(responseStatus).body(responseBody);
     }
 

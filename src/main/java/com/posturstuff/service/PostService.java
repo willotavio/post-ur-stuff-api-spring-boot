@@ -40,12 +40,43 @@ public class PostService {
         return postsDto;
     }
 
-    public Optional<PostViewDto> getById(String id) {
-        Optional<Post> post = postRepository.findById(id);
+    public Optional<PostViewDto> getById(String postId, String userId) {
+        Optional<Post> post = postRepository.findById(postId);
         if(post.isEmpty()) {
             return Optional.empty();
         }
+        else if(post.get().getVisibility() == PostVisibility.PRIVATE &&
+                !post.get().getUser().getId().equals(userId)) {
+            throw new UnauthorizedException("User with id " + userId + " is not authorized");
+        }
         return Optional.of(postMapper.postToPostViewDto(post.get()));
+    }
+
+    public List<PostViewDto> getByUserId(String id) {
+        List<Post> posts = postRepository.findByUserId(id);
+        List<PostViewDto> postsDto = new ArrayList<>();
+        for(Post post : posts) {
+            postsDto.add(postMapper.postToPostViewDto(post));
+        }
+        return postsDto;
+    }
+
+    public List<PostViewDto> getByVisibility(String visibility) {
+        List<Post> posts = postRepository.findByVisibility(visibility);
+        List<PostViewDto> postsDto = new ArrayList<>();
+        for(Post post : posts) {
+            postsDto.add(postMapper.postToPostViewDto(post));
+        }
+        return postsDto;
+    }
+
+    public List<PostViewDto> getByUserIdAndVisibility(String id, String visibility) {
+        List<Post> posts = postRepository.findByUserIdAndVisibility(id, visibility.toUpperCase());
+        List<PostViewDto> postsDto = new ArrayList<>();
+        for(Post post : posts) {
+            postsDto.add(postMapper.postToPostViewDto(post));
+        }
+        return postsDto;
     }
 
     public Optional<PostViewDto> add(PostAddDto postAddDto, String userId) {
