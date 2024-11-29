@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
             int indexStart = ex.getMessage().indexOf("index: ") + 7;
             int indexEnd = ex.getMessage().indexOf(" ", indexStart);
             field = ex.getMessage().substring(indexStart, indexEnd);
-            errors.put("error", "The provided " + field + " already exists");
+            errors.put(field, "The provided " + field + " already exists");
         }
         else {
             errors.put("error", "Error saving data");
