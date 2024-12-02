@@ -49,6 +49,20 @@ public class UserController {
         }
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Object> logout() {
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .sameSite("Lax")
+                .maxAge(0)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
+
     @PostMapping("/register")
     public ResponseEntity<UserViewDto> add(@RequestBody @Valid UserRegisterDto user) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(user));
