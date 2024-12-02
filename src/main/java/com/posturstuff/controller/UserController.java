@@ -8,7 +8,9 @@ import com.posturstuff.model.UserPrincipal;
 import com.posturstuff.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -27,18 +29,24 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<Object> getAll(@RequestBody @Valid UserLoginDto user) {
-        HttpStatus responseStatus = null;
         Map<String, String> responseBody = new HashMap<>();
         Optional<String> token = userService.verify(user);
         if(token.isEmpty()) {
-            responseStatus = HttpStatus.UNAUTHORIZED;
             responseBody.put("message", "Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
         }
         else {
-            responseStatus = HttpStatus.OK;
-            responseBody.put("token", token.get());
+            ResponseCookie cookie = ResponseCookie.from("jwt", token.get())
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .sameSite("Lax")
+                    .maxAge(3600 * 24 * 7)
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK)
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .build();
         }
-        return ResponseEntity.status(responseStatus).body(responseBody);
     }
 
     @PostMapping("/register")

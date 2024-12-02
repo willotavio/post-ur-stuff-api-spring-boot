@@ -20,9 +20,12 @@ public class WebConfig {
                         .allowedMethods(HttpMethod.GET.name(),
                                 HttpMethod.POST.name(),
                                 HttpMethod.PATCH.name(),
-                                HttpMethod.DELETE.name())
+                                HttpMethod.DELETE.name(),
+                                HttpMethod.OPTIONS.name())
                         .allowedHeaders(HttpHeaders.CONTENT_TYPE,
-                                HttpHeaders.AUTHORIZATION);
+                                HttpHeaders.AUTHORIZATION,
+                                HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS)
+                        .allowCredentials(true);
             }
         };
     }

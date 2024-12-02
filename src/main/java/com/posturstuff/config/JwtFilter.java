@@ -6,6 +6,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,17 +41,15 @@ public class JwtFilter extends OncePerRequestFilter {
            return;
        }
 
-       String authHeader = request.getHeader("Authorization");
-       String token = null;
+       String token = extractTokenFromCookies(request);
        String username = null;
 
        try {
-           if(authHeader != null && authHeader.startsWith("Bearer ")) {
-               token = authHeader.substring(7);
+           if(token != null) {
                username = jwtService.extractUsername(token);
            }
 
-           if(authHeader != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+           if(SecurityContextHolder.getContext().getAuthentication() == null) {
                UserDetails userDetails = context.getBean(UserDetailsServiceImpl.class).loadUserByUsername(username);
                if(jwtService.validateToken(token, userDetails)) {
                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -75,6 +74,18 @@ public class JwtFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         String jsonResponse = String.format("{\"error\": \"%s\", \"message\":\"%s\"}", error, message);
         response.getWriter().write(jsonResponse);
+    }
+
+    private String extractTokenFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if(cookies != null) {
+            for(Cookie cookie : cookies) {
+                if(cookie.getName().equals("jwt")) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 
 }
