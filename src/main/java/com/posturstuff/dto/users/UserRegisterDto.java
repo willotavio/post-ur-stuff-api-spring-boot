@@ -1,9 +1,11 @@
 package com.posturstuff.dto.users;
 
+import com.posturstuff.validation.PasswordMatch;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
+@PasswordMatch(password = "password", passwordConfirmation = "passwordConfirmation")
 public record UserRegisterDto(
         @NotBlank(message = "Provide an username")
         @Size(min = 4, max = 16, message = "The username must have between 4 and 16 characters")
