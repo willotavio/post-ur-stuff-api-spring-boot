@@ -43,8 +43,15 @@ public class UserController {
                     .sameSite("Lax")
                     .maxAge(3600 * 24 * 7)
                     .build();
+            ResponseCookie clientCookie = ResponseCookie.from("isLoggedIn", "true")
+                    .httpOnly(false)
+                    .secure(false)
+                    .path("/")
+                    .sameSite("Lax")
+                    .maxAge(3600 * 24 * 7)
+                    .build();
             return ResponseEntity.status(HttpStatus.OK)
-                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString(), clientCookie.toString())
                     .build();
         }
     }
@@ -58,8 +65,15 @@ public class UserController {
                 .sameSite("Lax")
                 .maxAge(0)
                 .build();
+        ResponseCookie clientCookie = ResponseCookie.from("isLoggedIn", "")
+                .httpOnly(false)
+                .secure(false)
+                .path("/")
+                .sameSite("Lax")
+                .maxAge(0)
+                .build();
         return ResponseEntity.status(HttpStatus.OK)
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .header(HttpHeaders.SET_COOKIE, cookie.toString(), clientCookie.toString())
                 .build();
     }
 
