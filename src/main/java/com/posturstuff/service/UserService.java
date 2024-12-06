@@ -35,7 +35,7 @@ public class UserService {
     @Autowired
     private JwtService jwtService;
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
     public UserViewDto register(UserRegisterDto user) {
         Users newUser = userRepository.save(new Users(
@@ -55,7 +55,8 @@ public class UserService {
     public Optional<String> verify(UserLoginDto user) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.username(), user.password()));
         if(authentication.isAuthenticated()) {
-            return Optional.of(jwtService.generateToken(user.username()));
+            Users authenticatedUser = userRepository.findByUsername(user.username());
+            return Optional.of(jwtService.generateToken(authenticatedUser.getId()));
         }
         return Optional.empty();
     }

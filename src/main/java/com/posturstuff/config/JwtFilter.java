@@ -1,5 +1,7 @@
 package com.posturstuff.config;
 
+import com.posturstuff.exception.user.UserNotFoundException;
+import com.posturstuff.model.UserPrincipal;
 import com.posturstuff.service.JwtService;
 import com.posturstuff.service.UserDetailsServiceImpl;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -13,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -42,15 +42,15 @@ public class JwtFilter extends OncePerRequestFilter {
        }
 
        String token = extractTokenFromCookies(request);
-       String username = null;
+       String id = null;
 
        try {
            if(token != null) {
-               username = jwtService.extractUsername(token);
+               id = jwtService.extractId(token);
            }
 
            if(SecurityContextHolder.getContext().getAuthentication() == null) {
-               UserDetails userDetails = context.getBean(UserDetailsServiceImpl.class).loadUserByUsername(username);
+               UserPrincipal userDetails = (UserPrincipal) context.getBean(UserDetailsServiceImpl.class).loadById(id);
                if(jwtService.validateToken(token, userDetails)) {
                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -63,7 +63,7 @@ public class JwtFilter extends OncePerRequestFilter {
             writeErrorResponse(response, "TOKEN_EXPIRED", ex.getMessage());
        } catch(SignatureException ex) {
            writeErrorResponse(response, "BAD_SIGNATURE", ex.getMessage());
-       } catch(UsernameNotFoundException ex) {
+       } catch(UserNotFoundException ex) {
            writeErrorResponse(response, "NOT_FOUND", ex.getMessage());
        }
 
