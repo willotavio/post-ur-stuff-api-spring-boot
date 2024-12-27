@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Document("posts")
@@ -24,11 +24,11 @@ public class Post {
     private List<String> images;
     @DBRef
     private Users user;
-    private LocalDate createdAt;
-    private LocalDate editedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime editedAt;
     private PostVisibility visibility;
 
-    public Post(String content, List<String> images, Users user, LocalDate createdAt, PostVisibility visibility) {
+    public Post(String content, List<String> images, Users user, LocalDateTime createdAt, PostVisibility visibility) {
         this.content = content;
         this.images = images;
         this.user = user;
