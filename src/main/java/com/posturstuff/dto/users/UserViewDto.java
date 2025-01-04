@@ -11,6 +11,7 @@ public record UserViewDto(
         LocalDate birthDate,
         String accountVisibility,
         String profilePicture,
-        String profileCover
+        String profileCover,
+        String description
 ) {
 }

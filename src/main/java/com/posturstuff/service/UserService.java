@@ -47,6 +47,7 @@ public class UserService {
                 user.birthDate() != null ? user.birthDate() : null,
                 AccountVisibility.PUBLIC,
                 null,
+                null,
                 null
         ));
         return userMapper.userToUserViewDto(newUser);
