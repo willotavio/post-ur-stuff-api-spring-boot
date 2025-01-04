@@ -6,6 +6,7 @@ import com.posturstuff.dto.users.UserUpdateDto;
 import com.posturstuff.dto.users.UserViewDto;
 import com.posturstuff.model.UserPrincipal;
 import com.posturstuff.service.UserService;
+import jakarta.servlet.ServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +29,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<Object> getAll(@RequestBody @Valid UserLoginDto user) {
+    public ResponseEntity<Object> login(@RequestBody @Valid UserLoginDto user) {
         Map<String, String> responseBody = new HashMap<>();
         Optional<String> token = userService.verify(user);
         if(token.isEmpty()) {
@@ -78,7 +79,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserViewDto> add(@RequestBody @Valid UserRegisterDto user) {
+    public ResponseEntity<UserViewDto> register(@RequestBody @Valid UserRegisterDto user) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(user));
     }
 
@@ -93,6 +94,22 @@ public class UserController {
         HttpStatus responseStatus = null;
         Map<String, Object> responseBody = new HashMap<>();
         Optional<UserViewDto> user = userService.getById(id);
+        if(user.isEmpty()) {
+            responseStatus = HttpStatus.NOT_FOUND;
+            responseBody.put("message", "User not found");
+        }
+        else {
+            responseStatus = HttpStatus.OK;
+            responseBody.put("user", user);
+        }
+        return ResponseEntity.status(responseStatus).body(responseBody);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Object> getOwn(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        HttpStatus responseStatus = null;
+        Map<String, Object> responseBody = new HashMap<>();
+        Optional<UserViewDto> user = userService.getById(userPrincipal.getId());
         if(user.isEmpty()) {
             responseStatus = HttpStatus.NOT_FOUND;
             responseBody.put("message", "User not found");
