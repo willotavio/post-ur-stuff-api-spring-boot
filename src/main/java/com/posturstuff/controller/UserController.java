@@ -105,6 +105,22 @@ public class UserController {
         return ResponseEntity.status(responseStatus).body(responseBody);
     }
 
+    @GetMapping("/username/{username}")
+    public ResponseEntity<Object> getByUsername(@PathVariable("username") String username) {
+    	HttpStatus responseStatus = null;
+	Map<String, Object> responseBody = new HashMap<>();
+	Optional<UserViewDto> user = userService.getByUsername(username);
+	if(user.isEmpty()) {
+	    responseStatus = HttpStatus.NOT_FOUND;
+	    responseBody.put("message", "User not found");	
+	}
+	else {
+	    responseStatus = HttpStatus.OK;
+	    responseBody.put("user", user.get());
+	}
+	return ResponseEntity.status(responseStatus).body(responseBody);
+    }
+
     @GetMapping("/me")
     public ResponseEntity<Object> getOwn(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         HttpStatus responseStatus = null;
