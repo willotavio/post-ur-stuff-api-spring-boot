@@ -33,8 +33,9 @@ public class Users {
 
     private String profilePicture;
     private String profileCover;
+    private String description;
 
-    public Users(String username, String displayName, String email, String password, LocalDate joinedAt, LocalDate birthDate, AccountVisibility accountVisibility, String profilePicture, String profileCover) {
+    public Users(String username, String displayName, String email, String password, LocalDate joinedAt, LocalDate birthDate, AccountVisibility accountVisibility, String profilePicture, String profileCover, String description) {
         this.username = username;
         this.displayName = displayName;
         this.email = email;
@@ -44,6 +45,7 @@ public class Users {
         this.accountVisibility = accountVisibility;
         this.profilePicture = profilePicture;
         this.profileCover = profileCover;
+        this.description = description;
     }
 
 }

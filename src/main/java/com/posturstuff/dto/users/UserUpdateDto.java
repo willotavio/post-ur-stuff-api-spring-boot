@@ -20,6 +20,8 @@ public record UserUpdateDto(
         LocalDate birthDate,
         int accountVisibility,
         String profilePicture,
-        String profileCover
+        String profileCover,
+        @Size(max = 200, message = "The description must have a maximum of 200 characters")
+        String description
 ) {
 }

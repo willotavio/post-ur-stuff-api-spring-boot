@@ -14,7 +14,7 @@ import com.posturstuff.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -89,7 +89,7 @@ public class PostService {
                     postAddDto.content(),
                     postAddDto.images(),
                     user.get(),
-                    LocalDate.now(),
+                    LocalDateTime.now(),
                     PostVisibility.valueOf(postAddDto.visibility())
             )
         );
@@ -114,7 +114,7 @@ public class PostService {
         if(postUpdateDto.visibility() > 0) {
             post.setVisibility(PostVisibility.valueOf(postUpdateDto.visibility()));
         }
-        post.setEditedAt(LocalDate.now());
+        post.setEditedAt(LocalDateTime.now());
         Post newPost = postRepository.save(post);
         return Optional.of(postMapper.postToPostViewDto(newPost));
     }

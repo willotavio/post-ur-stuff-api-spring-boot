@@ -5,6 +5,7 @@ import com.posturstuff.dto.users.UserRegisterDto;
 import com.posturstuff.dto.users.UserUpdateDto;
 import com.posturstuff.dto.users.UserViewDto;
 import com.posturstuff.enums.AccountVisibility;
+import com.posturstuff.exception.user.UserNotFoundException;
 import com.posturstuff.mapper.UserMapper;
 import com.posturstuff.model.Users;
 import com.posturstuff.repository.UserRepository;
@@ -47,6 +48,7 @@ public class UserService {
                 user.birthDate() != null ? user.birthDate() : null,
                 AccountVisibility.PUBLIC,
                 null,
+                null,
                 null
         ));
         return userMapper.userToUserViewDto(newUser);
@@ -76,6 +78,14 @@ public class UserService {
             return Optional.empty();
         }
         return Optional.of(userMapper.userToUserViewDto(user.get()));
+    }
+
+    public Optional<UserViewDto> getByUsername(String username) {
+        Users user = userRepository.findByUsername(username);
+        if(user == null) {
+            return Optional.empty();
+        }
+        return Optional.of(userMapper.userToUserViewDto(user));
     }
 
     public Optional<UserViewDto> update(String id, UserUpdateDto userUpdateDto) {
