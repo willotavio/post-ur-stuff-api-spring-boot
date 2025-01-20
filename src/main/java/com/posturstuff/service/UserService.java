@@ -119,6 +119,9 @@ public class UserService {
         if(userUpdateDto.profileCover() != null) {
             user.get().setProfileCover(userUpdateDto.profileCover());
         }
+        if(userUpdateDto.description() != null) {
+             user.get().setDescription(userUpdateDto.description());
+        }
         userRepository.save(user.get());
         return Optional.of(userMapper.userToUserViewDto(user.get()));
     }
