@@ -1,10 +1,8 @@
 package com.posturstuff.service;
 
-import com.posturstuff.dto.users.UserLoginDto;
-import com.posturstuff.dto.users.UserRegisterDto;
-import com.posturstuff.dto.users.UserUpdateDto;
-import com.posturstuff.dto.users.UserViewDto;
+import com.posturstuff.dto.users.*;
 import com.posturstuff.enums.AccountVisibility;
+import com.posturstuff.exception.authorization.UnauthorizedException;
 import com.posturstuff.exception.user.UserNotFoundException;
 import com.posturstuff.mapper.UserMapper;
 import com.posturstuff.model.Users;
@@ -54,7 +52,7 @@ public class UserService {
         return userMapper.userToUserViewDto(newUser);
     }
 
-    public Optional<String> verify(UserLoginDto user) {
+    public Optional<String> login(UserLoginDto user) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.username(), user.password()));
         if(authentication.isAuthenticated()) {
             Users authenticatedUser = userRepository.findByUsername(user.username());
@@ -124,6 +122,22 @@ public class UserService {
         }
         userRepository.save(user.get());
         return Optional.of(userMapper.userToUserViewDto(user.get()));
+    }
+
+    public Optional<UserViewDto> updatePassword(String id, PasswordUpdateDto passwordUpdateDto) {
+        Optional<Users> user = userRepository.findById(id);
+        if(user.isEmpty()) {
+            throw new UserNotFoundException("User with id " + " not found");
+        }
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.get().getUsername(), passwordUpdateDto.currentPassword()));
+        if(authentication.isAuthenticated()) {
+            user.get().setPassword(passwordEncoder.encode(passwordUpdateDto.newPassword()));
+            userRepository.save(user.get());
+            return Optional.of(userMapper.userToUserViewDto(user.get()));
+        }
+        else {
+            throw new UnauthorizedException("Invalid credentials");
+        }
     }
 
     public Optional<UserViewDto> deleteById(String id) {

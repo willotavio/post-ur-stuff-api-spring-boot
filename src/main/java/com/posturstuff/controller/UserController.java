@@ -1,9 +1,6 @@
 package com.posturstuff.controller;
 
-import com.posturstuff.dto.users.UserLoginDto;
-import com.posturstuff.dto.users.UserRegisterDto;
-import com.posturstuff.dto.users.UserUpdateDto;
-import com.posturstuff.dto.users.UserViewDto;
+import com.posturstuff.dto.users.*;
 import com.posturstuff.model.UserPrincipal;
 import com.posturstuff.service.UserService;
 import jakarta.servlet.ServletRequest;
@@ -31,7 +28,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody @Valid UserLoginDto user) {
         Map<String, String> responseBody = new HashMap<>();
-        Optional<String> token = userService.verify(user);
+        Optional<String> token = userService.login(user);
         if(token.isEmpty()) {
             responseBody.put("message", "Invalid credentials");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
@@ -151,6 +148,14 @@ public class UserController {
             responseBody.put("user", user);
         }
         return ResponseEntity.status(responseStatus).body(responseBody);
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<Object> updatePassword(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody @Valid PasswordUpdateDto passwordUpdateDto) {
+        Map<String, Object> responseBody = new HashMap<>();
+        Optional<UserViewDto> user = userService.updatePassword(userPrincipal.getId(), passwordUpdateDto);
+        responseBody.put("user", user.get());
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
     @DeleteMapping
