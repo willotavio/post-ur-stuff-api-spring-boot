@@ -23,10 +23,14 @@ public class PostController {
     public PostService postService;
 
     @GetMapping
-    public ResponseEntity<Map<String, List<PostViewDto>>> getAllPublic() {
+    public ResponseEntity<Map<String, List<PostViewDto>>> getAllPublic(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ) {
         HttpStatus responseStatus = HttpStatus.OK;
         Map<String, List<PostViewDto>> responseBody = new HashMap<>();
-        List<PostViewDto> posts = postService.getByVisibility(PostVisibility.PUBLIC.toString());
+        List<PostViewDto> posts = postService.getByVisibility(PostVisibility.PUBLIC.toString(), page, size, sortDirection);
         responseBody.put("posts", posts);
         return ResponseEntity.status(responseStatus).body(responseBody);
     }
@@ -48,28 +52,44 @@ public class PostController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Map<String, List<PostViewDto>>> getOwnPosts(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<Map<String, List<PostViewDto>>> getOwnPosts(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ) {
         HttpStatus responseStatus = HttpStatus.OK;
         Map<String, List<PostViewDto>> responseBody = new HashMap<>();
-        List<PostViewDto> posts = postService.getByUserId(userPrincipal.getId());
+        List<PostViewDto> posts = postService.getByUserId(userPrincipal.getId(), page, size, sortDirection);
         responseBody.put("posts", posts);
         return ResponseEntity.status(responseStatus).body(responseBody);
     }
 
     @GetMapping("/me/{visibility}")
-    public ResponseEntity<Map<String, List<PostViewDto>>> getOwnPostsWithVisibility(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable("visibility") String visibility) {
+    public ResponseEntity<Map<String, List<PostViewDto>>> getOwnPostsWithVisibility(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable("visibility") String visibility,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ) {
         HttpStatus responseStatus = HttpStatus.OK;
         Map<String, List<PostViewDto>> responseBody = new HashMap<>();
-        List<PostViewDto> posts = postService.getByUserIdAndVisibility(userPrincipal.getId(), visibility.toUpperCase());
+        List<PostViewDto> posts = postService.getByUserIdAndVisibility(userPrincipal.getId(), visibility.toUpperCase(), page, size, sortDirection);
         responseBody.put("posts", posts);
         return ResponseEntity.status(responseStatus).body(responseBody);
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<Map<String, List<PostViewDto>>> getPublicByUserId(@PathVariable("userId") String userId) {
+    public ResponseEntity<Map<String, List<PostViewDto>>> getPublicByUserId(
+            @PathVariable("userId") String userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "desc") String sortDirection
+            ) {
         HttpStatus responseStatus = HttpStatus.OK;
         Map<String, List<PostViewDto>> responseBody = new HashMap<>();
-        List<PostViewDto> posts = postService.getByUserIdAndVisibility(userId, PostVisibility.PUBLIC.toString());
+        List<PostViewDto> posts = postService.getByUserIdAndVisibility(userId, PostVisibility.PUBLIC.toString(), page, size, sortDirection);
         responseBody.put("posts", posts);
         return ResponseEntity.status(responseStatus).body(responseBody);
     }
