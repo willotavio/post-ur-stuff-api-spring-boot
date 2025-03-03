@@ -26,11 +26,12 @@ public class PostController {
     public ResponseEntity<Map<String, List<PostViewDto>>> getAllPublic(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "desc") String sortDirection
+            @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestParam(defaultValue = "createdAt") String field
     ) {
         HttpStatus responseStatus = HttpStatus.OK;
         Map<String, List<PostViewDto>> responseBody = new HashMap<>();
-        List<PostViewDto> posts = postService.getByVisibility(PostVisibility.PUBLIC.toString(), page, size, sortDirection);
+        List<PostViewDto> posts = postService.getByVisibility(PostVisibility.PUBLIC.toString(), page, size, sortDirection, field);
         responseBody.put("posts", posts);
         return ResponseEntity.status(responseStatus).body(responseBody);
     }
@@ -56,11 +57,12 @@ public class PostController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "desc") String sortDirection
+            @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestParam(defaultValue = "createdAt") String field
     ) {
         HttpStatus responseStatus = HttpStatus.OK;
         Map<String, List<PostViewDto>> responseBody = new HashMap<>();
-        List<PostViewDto> posts = postService.getByUserId(userPrincipal.getId(), page, size, sortDirection);
+        List<PostViewDto> posts = postService.getByUserId(userPrincipal.getId(), page, size, sortDirection, field);
         responseBody.put("posts", posts);
         return ResponseEntity.status(responseStatus).body(responseBody);
     }
@@ -71,11 +73,12 @@ public class PostController {
             @PathVariable("visibility") String visibility,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "desc") String sortDirection
+            @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestParam(defaultValue = "createdAt") String field
     ) {
         HttpStatus responseStatus = HttpStatus.OK;
         Map<String, List<PostViewDto>> responseBody = new HashMap<>();
-        List<PostViewDto> posts = postService.getByUserIdAndVisibility(userPrincipal.getId(), visibility.toUpperCase(), page, size, sortDirection);
+        List<PostViewDto> posts = postService.getByUserIdAndVisibility(userPrincipal.getId(), visibility.toUpperCase(), page, size, sortDirection, field);
         responseBody.put("posts", posts);
         return ResponseEntity.status(responseStatus).body(responseBody);
     }
@@ -85,11 +88,12 @@ public class PostController {
             @PathVariable("userId") String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "desc") String sortDirection
+            @RequestParam(defaultValue = "desc") String sortDirection,
+            @RequestParam(defaultValue = "createdAt") String field
             ) {
         HttpStatus responseStatus = HttpStatus.OK;
         Map<String, List<PostViewDto>> responseBody = new HashMap<>();
-        List<PostViewDto> posts = postService.getByUserIdAndVisibility(userId, PostVisibility.PUBLIC.toString(), page, size, sortDirection);
+        List<PostViewDto> posts = postService.getByUserIdAndVisibility(userId, PostVisibility.PUBLIC.toString(), page, size, sortDirection, field);
         responseBody.put("posts", posts);
         return ResponseEntity.status(responseStatus).body(responseBody);
     }

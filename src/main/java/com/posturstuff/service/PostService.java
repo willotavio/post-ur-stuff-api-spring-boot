@@ -56,10 +56,10 @@ public class PostService {
         return Optional.of(postMapper.postToPostViewDto(post.get()));
     }
 
-    public List<PostViewDto> getByUserId(String id, int page, int size, String sortDirection) {
+    public List<PostViewDto> getByUserId(String id, int page, int size, String sortDirection, String field) {
         Sort sort = sortDirection.equalsIgnoreCase("asc") ?
-                Sort.by(Sort.Order.asc("createdAt")) :
-                Sort.by(Sort.Order.desc("createdAt"));
+                Sort.by(Sort.Order.asc(field)) :
+                Sort.by(Sort.Order.desc(field));
         Pageable paging = PageRequest.of(page, size, sort);
         Page<Post> posts = postRepository.findByUserId(id, paging);
         List<Post> postList = posts.getContent();
@@ -70,10 +70,10 @@ public class PostService {
         return postsDto;
     }
 
-    public List<PostViewDto> getByVisibility(String visibility, int page, int size, String sortDirection) {
+    public List<PostViewDto> getByVisibility(String visibility, int page, int size, String sortDirection, String field) {
         Sort sort = sortDirection.equalsIgnoreCase("asc") ?
-                Sort.by(Sort.Order.asc("createdAt")) :
-                Sort.by(Sort.Order.desc("createdAt"));
+                Sort.by(Sort.Order.asc(field)) :
+                Sort.by(Sort.Order.desc(field));
         Pageable paging = PageRequest.of(page, size, sort);
         Page<Post> posts = postRepository.findByVisibility(visibility, paging);
         List<Post> postList = posts.getContent();
@@ -84,10 +84,10 @@ public class PostService {
         return postsDto;
     }
 
-    public List<PostViewDto> getByUserIdAndVisibility(String id, String visibility, int page, int size, String sortDirection) {
+    public List<PostViewDto> getByUserIdAndVisibility(String id, String visibility, int page, int size, String sortDirection, String field) {
         Sort sort = sortDirection.equalsIgnoreCase("asc") ?
-                Sort.by(Sort.Order.asc("createdAt")) :
-                Sort.by(Sort.Order.desc("createdAt"));
+                Sort.by(Sort.Order.asc(field)) :
+                Sort.by(Sort.Order.desc(field));
         Pageable paging = PageRequest.of(page, size, sort);
         Page<Post> posts = postRepository.findByUserIdAndVisibility(id, visibility.toUpperCase(), paging);
         List<Post> postList = posts.getContent();
