@@ -12,6 +12,10 @@ import com.posturstuff.model.Users;
 import com.posturstuff.repository.PostRepository;
 import com.posturstuff.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -52,28 +56,43 @@ public class PostService {
         return Optional.of(postMapper.postToPostViewDto(post.get()));
     }
 
-    public List<PostViewDto> getByUserId(String id) {
-        List<Post> posts = postRepository.findByUserId(id);
+    public List<PostViewDto> getByUserId(String id, int page, int size, String sortDirection, String field) {
+        Sort sort = sortDirection.equalsIgnoreCase("asc") ?
+                Sort.by(Sort.Order.asc(field)) :
+                Sort.by(Sort.Order.desc(field));
+        Pageable paging = PageRequest.of(page, size, sort);
+        Page<Post> posts = postRepository.findByUserId(id, paging);
+        List<Post> postList = posts.getContent();
         List<PostViewDto> postsDto = new ArrayList<>();
-        for(Post post : posts) {
+        for(Post post : postList) {
             postsDto.add(postMapper.postToPostViewDto(post));
         }
         return postsDto;
     }
 
-    public List<PostViewDto> getByVisibility(String visibility) {
-        List<Post> posts = postRepository.findByVisibility(visibility);
+    public List<PostViewDto> getByVisibility(String visibility, int page, int size, String sortDirection, String field) {
+        Sort sort = sortDirection.equalsIgnoreCase("asc") ?
+                Sort.by(Sort.Order.asc(field)) :
+                Sort.by(Sort.Order.desc(field));
+        Pageable paging = PageRequest.of(page, size, sort);
+        Page<Post> posts = postRepository.findByVisibility(visibility, paging);
+        List<Post> postList = posts.getContent();
         List<PostViewDto> postsDto = new ArrayList<>();
-        for(Post post : posts) {
+        for(Post post : postList) {
             postsDto.add(postMapper.postToPostViewDto(post));
         }
         return postsDto;
     }
 
-    public List<PostViewDto> getByUserIdAndVisibility(String id, String visibility) {
-        List<Post> posts = postRepository.findByUserIdAndVisibility(id, visibility.toUpperCase());
+    public List<PostViewDto> getByUserIdAndVisibility(String id, String visibility, int page, int size, String sortDirection, String field) {
+        Sort sort = sortDirection.equalsIgnoreCase("asc") ?
+                Sort.by(Sort.Order.asc(field)) :
+                Sort.by(Sort.Order.desc(field));
+        Pageable paging = PageRequest.of(page, size, sort);
+        Page<Post> posts = postRepository.findByUserIdAndVisibility(id, visibility.toUpperCase(), paging);
+        List<Post> postList = posts.getContent();
         List<PostViewDto> postsDto = new ArrayList<>();
-        for(Post post : posts) {
+        for(Post post : postList) {
             postsDto.add(postMapper.postToPostViewDto(post));
         }
         return postsDto;
