@@ -6,6 +6,7 @@ import com.posturstuff.service.UserService;
 import jakarta.servlet.ServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -25,6 +26,9 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Value("${environment}")
+    private String environment;
+
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody @Valid UserLoginDto user) {
         Map<String, String> responseBody = new HashMap<>();
@@ -36,16 +40,16 @@ public class UserController {
         else {
             ResponseCookie cookie = ResponseCookie.from("jwt", token.get())
                     .httpOnly(true)
-                    .secure(false)
+                    .secure(!environment.equals("dev"))
                     .path("/")
-                    .sameSite("Lax")
+                    .sameSite(environment.equals("dev") ? "Lax" : "None")
                     .maxAge(3600 * 24 * 7)
                     .build();
             ResponseCookie clientCookie = ResponseCookie.from("isLoggedIn", "true")
                     .httpOnly(false)
-                    .secure(false)
+                    .secure(!environment.equals("dev"))
                     .path("/")
-                    .sameSite("Lax")
+                    .sameSite(environment.equals("dev") ? "Lax" : "None")
                     .maxAge(3600 * 24 * 7)
                     .build();
             return ResponseEntity.status(HttpStatus.OK)
