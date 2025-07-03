@@ -16,7 +16,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000", "http://localhost:5173", "https://post-ur-stuff-vite-69edfb4cfb56.herokuapp.com")
+                        .allowedOrigins("http://localhost:3000", "http://localhost:5173", "https://post-ur-stuff-vite-69edfb4cfb56.herokuapp.com", "https://post-ur-stuff-react-vite.onrender.com")
                         .allowedMethods(HttpMethod.GET.name(),
                                 HttpMethod.POST.name(),
                                 HttpMethod.PATCH.name(),

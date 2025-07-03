@@ -63,7 +63,7 @@ public class SecurityConfig {
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:5173", "https://post-ur-stuff-vite-69edfb4cfb56.herokuapp.com"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:5173", "https://post-ur-stuff-vite-69edfb4cfb56.herokuapp.com", "https://post-ur-stuff-react-vite.onrender.com"));
         configuration.setAllowedMethods(Arrays.asList(HttpMethod.GET.name(),
                 HttpMethod.POST.name(),
                 HttpMethod.PATCH.name(),
