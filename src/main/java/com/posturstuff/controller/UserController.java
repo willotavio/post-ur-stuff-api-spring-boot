@@ -26,9 +26,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Value("${environment}")
-    private String environment;
-
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody @Valid UserLoginDto user) {
         Map<String, String> responseBody = new HashMap<>();
@@ -38,45 +35,10 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
         }
         else {
-            ResponseCookie cookie = ResponseCookie.from("jwt", token.get())
-                    .httpOnly(true)
-                    .secure(!environment.equals("dev"))
-                    .path("/")
-                    .sameSite(environment.equals("dev") ? "Lax" : "None")
-                    .maxAge(3600 * 24 * 7)
-                    .build();
-            ResponseCookie clientCookie = ResponseCookie.from("isLoggedIn", "true")
-                    .httpOnly(false)
-                    .secure(!environment.equals("dev"))
-                    .path("/")
-                    .sameSite(environment.equals("dev") ? "Lax" : "None")
-                    .maxAge(3600 * 24 * 7)
-                    .build();
+            responseBody.put("token", token.get());
             return ResponseEntity.status(HttpStatus.OK)
-                    .header(HttpHeaders.SET_COOKIE, cookie.toString(), clientCookie.toString())
-                    .build();
+                    .body(responseBody);
         }
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<Object> logout() {
-        ResponseCookie cookie = ResponseCookie.from("jwt", "")
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .sameSite("Lax")
-                .maxAge(0)
-                .build();
-        ResponseCookie clientCookie = ResponseCookie.from("isLoggedIn", "")
-                .httpOnly(false)
-                .secure(false)
-                .path("/")
-                .sameSite("Lax")
-                .maxAge(0)
-                .build();
-        return ResponseEntity.status(HttpStatus.OK)
-                .header(HttpHeaders.SET_COOKIE, cookie.toString(), clientCookie.toString())
-                .build();
     }
 
     @PostMapping("/register")

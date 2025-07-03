@@ -8,7 +8,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +40,13 @@ public class JwtFilter extends OncePerRequestFilter {
            return;
        }
 
-       String token = extractTokenFromCookies(request);
+       String authHeader = request.getHeader("Authorization");
+       String token = null;
        String id = null;
 
        try {
-           if(token != null) {
+           if(authHeader != null && authHeader.startsWith("Bearer ")) {
+               token = authHeader.substring(7);
                id = jwtService.extractId(token);
            }
 
@@ -74,18 +75,6 @@ public class JwtFilter extends OncePerRequestFilter {
         response.setContentType("application/json");
         String jsonResponse = String.format("{\"error\": \"%s\", \"message\":\"%s\"}", error, message);
         response.getWriter().write(jsonResponse);
-    }
-
-    private String extractTokenFromCookies(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if(cookies != null) {
-            for(Cookie cookie : cookies) {
-                if(cookie.getName().equals("jwt")) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
     }
 
 }
