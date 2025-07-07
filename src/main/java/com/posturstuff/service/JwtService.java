@@ -26,6 +26,8 @@ public class JwtService {
     private String privateKeyStr;
     @Value("${jwt.public.key}")
     private String publicKeyStr;
+    @Value("${jwt.exp}")
+    private String jwtExpTime;
 
     private RSAPrivateKey privateKey;
     private RSAPublicKey publicKey;
@@ -60,7 +62,7 @@ public class JwtService {
                 .add(claims)
                 .subject(id)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 12))
+                .expiration(new Date(System.currentTimeMillis() + Integer.parseInt(jwtExpTime)))
                 .and()
                 .signWith(privateKey)
                 .compact();
