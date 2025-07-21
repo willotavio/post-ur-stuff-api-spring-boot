@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PostRepository extends MongoRepository<Post, String> {
+public interface PostRepository extends MongoRepository<Post, String>, CustomPostRepository {
     Page<Post> findByUserId(String userId, Pageable pageable);
     Page<Post> findByVisibility(String visibility, Pageable pageable);
     Page<Post> findByUserIdAndVisibility(String userId, String visibility, Pageable pageable);

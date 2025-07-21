@@ -1,6 +1,7 @@
 package com.posturstuff.service;
 
 import com.posturstuff.dto.posts.PostAddDto;
+import com.posturstuff.dto.posts.PostFiltersDto;
 import com.posturstuff.dto.posts.PostUpdateDto;
 import com.posturstuff.dto.posts.PostViewDto;
 import com.posturstuff.enums.PostVisibility;
@@ -37,6 +38,36 @@ public class PostService {
 
     public List<PostViewDto> getAll() {
         List<Post> posts = postRepository.findAll();
+        List<PostViewDto> postsDto = new ArrayList<>();
+        for(Post post : posts) {
+            postsDto.add(postMapper.postToPostViewDto(post));
+        }
+        return postsDto;
+    }
+
+    public List<PostViewDto> getByFilters(String userId, PostFiltersDto filters) {
+        List<Post> posts;
+        // if user wants their own posts, fetch them the way they requested (public and/or private)
+        // if user wants posts from someone else, or from everyone, fetch only public posts
+
+        if(filters.userId() != null && userId.equals(filters.userId())) {
+            posts = postRepository.findByFilters(filters);
+        }
+        else {
+            List<Integer> visibility = new ArrayList<>();
+            visibility.add(1);
+            PostFiltersDto newFilters = new PostFiltersDto(
+                    filters.id(),
+                    filters.userId(),
+                    filters.createdAtMin(),
+                    filters.createdAtMax(),
+                    filters.editedAtMin(),
+                    filters.editedAtMax(),
+                    visibility
+            );
+            posts = postRepository.findByFilters(newFilters);
+        }
+
         List<PostViewDto> postsDto = new ArrayList<>();
         for(Post post : posts) {
             postsDto.add(postMapper.postToPostViewDto(post));

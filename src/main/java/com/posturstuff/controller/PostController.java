@@ -1,6 +1,7 @@
 package com.posturstuff.controller;
 
 import com.posturstuff.dto.posts.PostAddDto;
+import com.posturstuff.dto.posts.PostFiltersDto;
 import com.posturstuff.dto.posts.PostUpdateDto;
 import com.posturstuff.dto.posts.PostViewDto;
 import com.posturstuff.enums.PostVisibility;
@@ -34,6 +35,14 @@ public class PostController {
         List<PostViewDto> posts = postService.getByVisibility(PostVisibility.PUBLIC.toString(), page, size, sortDirection, field);
         responseBody.put("posts", posts);
         return ResponseEntity.status(responseStatus).body(responseBody);
+    }
+
+    @PostMapping("/filters")
+    public ResponseEntity<Map<String, List<PostViewDto>>> getByFilters(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody @Valid PostFiltersDto filters) {
+        Map<String, List<PostViewDto>> responseBody = new HashMap<>();
+        List<PostViewDto> posts = postService.getByFilters(userPrincipal.getId(), filters);
+        responseBody.put("posts", posts);
+        return ResponseEntity.status(HttpStatus.OK).body(responseBody);
     }
 
     @GetMapping("/{id}")
